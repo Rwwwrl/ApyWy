@@ -7,14 +7,14 @@ repos:
         entry: yapf
         language: system
         types: [python]
-        args: ['--style=.style', '--in-place']
+        args: ['--style=setup.cfg', '--in-place']
 
       - id: mypy
         name: mypy
         entry: mypy
         language: system
         types: [python]
-        args: ['--config-file=.style']
+        args: ['--config-file=setup.cfg']
         
       - id: flake8
         name: flake8
