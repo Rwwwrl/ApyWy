@@ -22,6 +22,9 @@
                     {% for http_status in method.http_data.http_statuses %}
                         <p>STATUS_CODE: {{ http_status.expected_response_status_code }}</p>
                         <p>RESPONSE_DATA: {{ http_status.expected_response_data }}</p>
+                        {% if http_status.comment %}
+                            <p>COMMENT: {{ http_status.comment }}</p>
+                        {% endif %}
                     {% endfor %}
                 {% endfor %}
             {% endfor %}
