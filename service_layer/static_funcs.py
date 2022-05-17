@@ -1,17 +1,29 @@
-from typing import List, Optional, Union
+from typing import List, Optional, Tuple, Union
 
+from django.conf import settings
 from django.urls.resolvers import URLPattern, URLResolver
 
 from .entities import NameSpace, View
 
-BUILDIN_APPS_TO_IGNORE = ('admin', )
+BUILDIN_NAMESPACES_TO_IGNORE = ('apywy', 'admin')
+USER_DECLARED_NAMESPACES_TO_IGNORE: Tuple = getattr(settings, 'NAMESPACES_TO_IGNORE', tuple())
+
+
+def check_is_namespace_name_in_ignore(namespace_name: str) -> bool:
+    '''
+    проверяет, находится ли namespace с именем namespace_name в игноре для ApyWy
+    '''
+    if USER_DECLARED_NAMESPACES_TO_IGNORE == ('*', ):
+        return True
+
+    namespaces = BUILDIN_NAMESPACES_TO_IGNORE + USER_DECLARED_NAMESPACES_TO_IGNORE
+    return namespace_name in namespaces
 
 
 def get_all_urlpatterns() -> List[Union[URLPattern, URLResolver]]:
     '''
     получить все urlpatterns в проекте
     '''
-    from django.conf import settings
     from importlib import import_module
     root_urlconf = import_module(settings.ROOT_URLCONF)
     return root_urlconf.urlpatterns
@@ -31,8 +43,9 @@ def get_all_view_classes(urlpatterns: List[Union[URLPattern, URLResolver]]) -> L
 
         for pattern in urlpatterns:
             if isinstance(pattern, URLResolver):
-                if pattern.app_name not in BUILDIN_APPS_TO_IGNORE:
-                    namespace = NameSpace(namespace_name=str(pattern.namespace))
+                namespace_name = str(pattern.namespace)
+                if not check_is_namespace_name_in_ignore(namespace_name=namespace_name):
+                    namespace = NameSpace(namespace_name=namespace_name)
                     inner(pattern.url_patterns)
             elif isinstance(pattern, URLPattern):
                 view_class = pattern.callback.view_class
