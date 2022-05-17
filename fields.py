@@ -59,7 +59,12 @@ class DefaulHttpMethodField(metaclass=HttpMethodFieldMETA):
         '''
         По аналогию с drf, метод отвечающий за серилазацию поля
         '''
-        result = {'http_statuses': [], 'expected_request_data': self.META.expected_request_data}    # type: ignore
+        try:
+            expected_request_data = self.META.expected_request_data    # type: ignore
+        except AttributeError:
+            expected_request_data = {}
+
+        result = {'http_statuses': [], 'expected_request_data': expected_request_data}
         for http_status in self.http_statuses:
             result['http_statuses'].append(http_status.to_representation())
         return result

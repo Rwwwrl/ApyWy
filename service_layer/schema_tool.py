@@ -1,6 +1,7 @@
 from typing import Dict, List
 
-from . import entities, schema_fields
+from . import entities
+from .. import fields
 from ..utilities.custom_typing import DjangoView
 
 ALL_HTTP_METHODS = set(['GET', 'POST', 'DELETE', 'PUT', 'PATCH'])
@@ -25,7 +26,7 @@ class SchemaTool:
             http_method = http_method.upper()
             schema_method_data = {
                 'doc_string': getattr(view_cls, http_method.lower()).__doc__,
-                'schema_data': schema_fields.EmptyHttpMethodField(),
+                'schema_data': fields.EmptyHttpMethodField(),
             }
             swagger_data['methods'][http_method] = schema_method_data
         view_cls._schema_data = swagger_data
