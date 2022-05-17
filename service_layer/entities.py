@@ -1,5 +1,7 @@
 from typing import Any, Dict, List
 
+from django.urls.resolvers import URLPattern
+
 from ..utilities.custom_typing import DjangoView
 
 
@@ -55,7 +57,7 @@ class View(Singletone):
         view_class_name = view_class.__name__
         return super().__new__(cls, key=view_class_name)
 
-    def __init__(self, view_class: DjangoView, url_path: str) -> None:
+    def __init__(self, view_class: DjangoView, url_path: URLPattern) -> None:
         self.view_class = view_class
         self.url_path = url_path
 

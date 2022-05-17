@@ -37,20 +37,23 @@ def get_all_view_classes(urlpatterns: List[Union[URLPattern, URLResolver]]) -> L
     VIEW_CLASSES = []
 
     namespace: Optional[NameSpace] = None
+    _root: Optional[str] = None
 
     def inner(urlpatterns: List[Union[URLPattern, URLResolver]]) -> List[View]:
-        nonlocal namespace
+        nonlocal namespace, _root
 
         for pattern in urlpatterns:
             if isinstance(pattern, URLResolver):
                 namespace_name = str(pattern.namespace)
+                _root = pattern.pattern._route
                 if not check_is_namespace_name_in_ignore(namespace_name=namespace_name):
                     namespace = NameSpace(namespace_name=namespace_name)
                     inner(pattern.url_patterns)
             elif isinstance(pattern, URLPattern):
                 view_class = pattern.callback.view_class
-                url_path_to_view = str(pattern.pattern)
-                view_class = View(view_class=view_class, url_path=url_path_to_view)
+                path_to_view = pattern.pattern
+                path_to_view._root = _root
+                view_class = View(view_class=view_class, url_path=path_to_view)
                 namespace.append(view_class)    # type: ignore
                 VIEW_CLASSES.append(view_class)
         return VIEW_CLASSES

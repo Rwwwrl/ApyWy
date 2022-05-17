@@ -20,6 +20,7 @@ class SchemaTool:
         view_http_methods = filter(lambda attr_name: attr_name.upper() in ALL_HTTP_METHODS, view_cls.__dict__.keys())
         swagger_data = {
             'doc_string': view_cls.__doc__,
+            'view_name': view_cls.__name__,
             'methods': {},
         }
         for http_method in view_http_methods:
