@@ -1,34 +1,63 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+
+<head>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
-  </head>
-  <body>
-    {% block content %}
+    <link rel="stylesheet" href="{% static 'index.css' %}">
+</head>
+
+<body>
+
+    <div class="container">
+
+        {% block content %}
         {% for namespace in namespaces %}
-        <h4>NAMESPACE NAME: {{ namespace.namespace_name }}</h4>
-            {% for view in namespace.views %}
-            <p>URL: {{ view.url_path }}</p>
-            <p>VIEW doc string: {{ view.doc_string }}</p>
-                {% for method in view.view_methods %}
-                <p>HTTP METHOD: {{ method.HTTP_method }}</p>
-                <p>method doc string: {{ method.doc_string }}</p>
-                {% if method.http_data.expected_request_data %}
-                    <p>REQUEST_DATA: {{ method.http_data.expected_request_data }}</p>
-                {% endif %}
-                    {% for http_status in method.http_data.http_statuses %}
-                        <p>STATUS_CODE: {{ http_status.expected_response_status_code }}</p>
-                        <p>RESPONSE_DATA: {{ http_status.expected_response_data }}</p>
-                        {% if http_status.comment %}
-                            <p>COMMENT: {{ http_status.comment }}</p>
-                        {% endif %}
-                    {% endfor %}
-                {% endfor %}
+        <div>
+            <h1 class="namespace_name">{{ namespace.namespace_name }}</h1>
+        </div>
+        <hr>
+        {% for view in namespace.views %}
+        <div class="view_container">
+            <div class="view_block">
+                <h2 class='view_name'>{{ view.view_name }}</h2>
+                <p class='view_doc_string'><q>{{ view.doc_string }}<q></p>
+            </div>
+            {% for method in view.view_methods %}
+                <div class="method_block">
+                    <div class="http_method_block"><p class="http_method">{{ method.HTTP_method }}</p></div>
+                    <div class="http_url_block">
+                        <div class="http_url http_url_path">{{ view.url_path }}</div>
+                        <div class="http_url http_url_name"><p class="http_url url_name_arg">url_name=</p><p>{{ view.url_name }}</p></div>
+                        <div class="http_url http_url_doc_string"><q>{{ method.doc_string }}</q></div>
+                    </div>
+                </div>
+            <code>
+            {% if method.http_data.expected_request_data %}
+                request_data = {{ method.http_data.expected_request_data }}
+            {% endif %}
+            </code>
+            {% for http_status in method.http_data.http_statuses %}
+                <p>STATUS_CODE: {{ http_status.expected_response_status_code }}</p>
+                <p>RESPONSE_DATA: {{ http_status.expected_response_data }}</p>
+            {% if http_status.comment %}
+                <p>COMMENT: {{ http_status.comment }}</p>
+            {% endif %}
             {% endfor %}
+            {% endfor %}
+            {% endfor %}
+        </div>
         {% endfor %}
-    {% endblock content %}
-  </body>
+        {% endblock content %}
+
+    </div>
+
+
+    <script src="{% static 'index.js' %}"></script>
+
+</body>
+
 </html>
