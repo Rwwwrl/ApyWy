@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    {% block content %}
+        {% for namespace in namespaces %}
+        <h4>NAMESPACE NAME: {{ namespace.namespace_name }}</h4>
+            {% for view in namespace.views %}
+            <p>URL: {{ view.url_path }}</p>
+            <p>VIEW doc string: {{ view.doc_string }}</p>
+                {% for method in view.view_methods %}
+                <p>HTTP METHOD: {{ method.HTTP_method }}</p>
+                <p>method doc string: {{ method.doc_string }}</p>
+                {% if method.http_data.expected_request_data %}
+                    <p>REQUEST_DATA: {{ method.http_data.expected_request_data }}</p>
+                {% endif %}
+                    {% for http_status in method.http_data.http_statuses %}
+                        <p>STATUS_CODE: {{ http_status.expected_response_status_code }}</p>
+                        <p>RESPONSE_DATA: {{ http_status.expected_response_data }}</p>
+                    {% endfor %}
+                {% endfor %}
+            {% endfor %}
+        {% endfor %}
+    {% endblock content %}
+  </body>
+</html>
