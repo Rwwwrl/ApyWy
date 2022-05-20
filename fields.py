@@ -1,4 +1,7 @@
+import json
 from typing import Dict, List, Optional, Tuple
+
+from .service_layer.serializers import BaseHTTPField
 
 
 class HttpMethodFieldMETA(type):
@@ -40,14 +43,15 @@ class HttpStatusField:
         '''
         По аналогию с drf, метод отвечающий за серилазацию поля
         '''
+        beautify_expected_response_data = json.dumps(self.expected_response_data, indent=4, ensure_ascii=False)
         return {
             'expected_response_status_code': self.response_status_code,
-            'expected_response_data': self.expected_response_data,
+            'expected_response_data': beautify_expected_response_data,
             'comment': self.comment,
         }
 
 
-class DefaulHttpMethodField(metaclass=HttpMethodFieldMETA):
+class HttpMethodField(BaseHTTPField, metaclass=HttpMethodFieldMETA):
     '''
     Поле HTTP метода
     '''
@@ -56,27 +60,15 @@ class DefaulHttpMethodField(metaclass=HttpMethodFieldMETA):
         return self._http_statuses    # type: ignore
 
     def to_representation(self) -> Dict:
-        '''
-        По аналогию с drf, метод отвечающий за серилазацию поля
-        '''
-        try:
-            expected_request_data = self.META.expected_request_data    # type: ignore
-        except AttributeError:
-            expected_request_data = {}
-
-        result = {'http_statuses': [], 'expected_request_data': expected_request_data}
+        data = super().to_representation()
         for http_status in self.http_statuses:
-            result['http_statuses'].append(http_status.to_representation())
-        return result
+            data['http_statuses'].append(http_status.to_representation())    # type: ignore
+        return data
 
 
-class EmptyHttpMethodField:
+class EmptyHttpMethodField(BaseHTTPField):
     '''
     Поле пустого (не определенного разработчиком) HTTP метода. Нужен для присваивания в декораторе, ручками
     разработчик его навешивать не должен.
     '''
-    def to_representation(self) -> List:
-        '''
-        По аналогию с drf, метод отвечающий за серилазацию поля
-        '''
-        return []
+    pass
