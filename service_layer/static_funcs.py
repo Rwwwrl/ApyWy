@@ -11,7 +11,7 @@ USER_DECLARED_NAMESPACES_TO_IGNORE: Tuple = getattr(settings, 'NAMESPACES_TO_IGN
 
 def check_is_namespace_name_in_ignore(namespace_name: str) -> bool:
     '''
-    проверяет, находится ли namespace с именем namespace_name в игноре для ApyWy
+    проверяет, находится ли namespace с именем namespace_name в игноре для apywy
     '''
     if USER_DECLARED_NAMESPACES_TO_IGNORE == ('*', ):
         return True
