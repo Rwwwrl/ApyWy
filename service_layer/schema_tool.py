@@ -3,7 +3,7 @@ from typing import Dict, List
 from . import entities
 from ..utilities.custom_typing import DjangoView
 
-ALL_HTTP_METHODS = set(['GET', 'POST', 'DELETE', 'PUT', 'PATCH'])
+ALL_HTTP_METHODS = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']
 
 
 class SchemaTool:
