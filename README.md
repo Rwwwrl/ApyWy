@@ -1,26 +1,31 @@
-# ApyWy - Аналог Swagger
+# ApyWy - аналог Swagger
+
+Основную проблему, которую решает *ApyWy* - большое количество времени разработчика для написания схемы (*schema*) для класса *View*. В моей версии мы можем использовать обычные питоновские словари для обозначения ожидаемых данные и ожидаемого ответа.
+
+## Пример не настроенной версии apywy:
+![alt](static_images/default_apywy.png)
+## Пример настроенной версии apywy:
+![alt](static_images/configured_apywy.gif)
 
 ## Установка
 
-1. Добавляем в _proj.settings.INSTALLED_APPS_
+1. Добавляем в *settings.INSTALLED_APPS*:
 
 ```python
 INSTALLED_APPS = [
     ...
-
-    'ApyWy.api',
+    'apywy.api',
+    ...
 ]
 ```
 
-**ВАЖНО!** Оно должно быть после всех приложений, т.е. в конце.
-
-2. Добавляем в _proj.urls.py_
+2. Добавляем в _urls.py_ главного приложения:
 
 ```python
-path('apywy/', include(('ApyWy.api.urls', 'ApyWy.api'), namespace='apywy')),
+path('apywy/', include(('apywy.api.urls', 'apywy.api'), namespace='apywy')),
 ```
 
-3. Готово, на главной странице _ApyWy_ - ***/apywy/***  есть вся возможная информация без дополнительных настроек.
+3. **Готово**, на главной странице _ApyWy_ - ***/apywy/***  есть вся возможная информация без дополнительных настроек.
 
 ## Настройка
 
@@ -31,7 +36,7 @@ path('apywy/', include(('ApyWy.api.urls', 'ApyWy.api'), namespace='apywy')),
 
 Но мы можем это исправить, построив _ApyWy_ схему для вьюшки.
 
-Наш файл *views.py*
+Наш файл *views.py*:
 ```python
 # views.py
 class HomePageView(APIView):
@@ -54,28 +59,28 @@ class HomePageView(APIView):
 * Создаем файл *apywy_schemas.py* (имя не важно)
 ```python
 # apywy_schemas.py
-from ApyWy.fields import HttpStatusField, DefaulHttpMethodField
-from ApyWy.schema import Schema
+from apywy.fields import HttpStatusField, HttpMethodField
+from apywy.schema import Schema
 
 
 class HomePageSchema(Schema):
 
-    class GET(DefaulHttpMethodField):
+    class GET(HttpMethodField):
 
         HTTP_200 = HttpStatusField(
             expected_response_data={'ANSWER': 'GET-RESULT'},
             )
 
         HTTP_500 = HttpStatusField(
-            expected_response_data={'ANSWER': 'GET-INVALID-RESULT'}
+            expected_response_data={'ANSWER': 'GET-INVALID-RESULT'},
+            commment='wrong query arg',
         )
-
 ```
-* Навешиваем эту схему на view
+* Навешиваем эту схему на view:
 ```python
 # views.py
 ...
-from ApyWy.decorators import set_apywy_schema
+from apywy.decorators import set_apywy_schema
 
 from .apywy_schemas import HomePageSchema
 
@@ -93,7 +98,7 @@ class HomePageView(APIView):
 class HomePageSchema(Schema):
     ...
 
-    class POST(DefaulHttpMethodField):
+    class POST(HttpMethodField):
 
         HTTP_201 = HttpStatusField(
             expected_response_data={'ANSWER': 'POST-RESULT'}
@@ -105,13 +110,13 @@ class HomePageSchema(Schema):
 По итогу, конечный вариант нашей схемы:
 ```python
 # apywy_schemas.py
-from ApyWy.fields import HttpStatusField, DefaulHttpMethodField
-from ApyWy.schema import Schema
+from apywy.fields import HttpStatusField, HttpMethodField
+from apywy.schema import Schema
 
 
 class HomePageSchema(Schema):
 
-    class GET(DefaulHttpMethodField):
+    class GET(HttpMethodField):
 
         HTTP_200 = HttpStatusField(
             expected_response_data={'ANSWER': 'GET-RESULT'},
@@ -122,7 +127,7 @@ class HomePageSchema(Schema):
             commment='wrong query arg',
         )
 
-    class POST(DefaulHttpMethodField):
+    class POST(HttpMethodField):
 
         HTTP_201 = HttpStatusField(
             expected_response_data={'ANSWER': 'POST-RESULT'}
@@ -141,7 +146,7 @@ class HomePageSchema(Schema):
 ('apywy', 'admin')
 ```
 
-Если вы хотите игнорировать дополнительные неймспейсы, то укажите это в \*<proj>.settings.NAMESPACES_TO_IGNORE:
+Если вы хотите игнорировать дополнительные неймспейсы, то укажите это в *settings.NAMESPACES_TO_IGNORE*:
 
 ```python
 NAMESPACES_TO_IGNORE = ()  # значение по умолчанию
@@ -150,3 +155,7 @@ NAMESPACES_TO_IGNORE = ('app', )  # игнорировать namespace с име
 
 NAMESPACES_TO_IGNORE = ('*', )  # игнорировать все неймспейсы
 ```
+
+### TODO:
+* Не везде сейчас есть комментарии
+* Рефакторить index.js
