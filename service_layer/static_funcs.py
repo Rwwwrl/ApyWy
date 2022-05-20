@@ -45,12 +45,21 @@ def get_all_view_classes(urlpatterns: List[Union[URLPattern, URLResolver]]) -> L
         for pattern in urlpatterns:
             if isinstance(pattern, URLResolver):
                 namespace_name = str(pattern.namespace)
-                _root = pattern.pattern._route
+
+                try:
+                    _root = pattern.pattern._route
+                except AttributeError:
+                    _root = None
+
                 if not check_is_namespace_name_in_ignore(namespace_name=namespace_name):
                     namespace = NameSpace(namespace_name=namespace_name)
                     inner(pattern.url_patterns)
             elif isinstance(pattern, URLPattern):
-                view_class = pattern.callback.view_class
+                try:
+                    # мы не умеем работать с func-based views, поэтому просто их скипаем
+                    view_class = pattern.callback.view_class
+                except AttributeError:
+                    continue
                 path_to_view = pattern.pattern
                 path_to_view._root = _root
                 view_class = View(view_class=view_class, url_path=path_to_view)
