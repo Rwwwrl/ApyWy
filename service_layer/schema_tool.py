@@ -1,7 +1,6 @@
 from typing import Dict, List
 
 from . import entities
-from .. import fields
 from ..utilities.custom_typing import DjangoView
 
 ALL_HTTP_METHODS = set(['GET', 'POST', 'DELETE', 'PUT', 'PATCH'])
@@ -9,15 +8,28 @@ ALL_HTTP_METHODS = set(['GET', 'POST', 'DELETE', 'PUT', 'PATCH'])
 
 class SchemaTool:
     @staticmethod
+    def _check_view_has_method_attr(view_cls: DjangoView, http_method: str) -> bool:
+        '''
+        функция для проверки наличия у DjangoView http метода
+        '''
+        return hasattr(view_cls, http_method)
+
+    @staticmethod
     def set_default_schema_data_to_view_class(view_cls: DjangoView) -> None:
         '''
         Навесить на класс DjangoView дефолтные schema данные
         '''
+        from .. import fields
+
         # нам не нужно навешивать дефолтную схему, если там уже весит схема (от декоратора).
         if hasattr(view_cls, '_schema_data'):
             return
 
-        view_http_methods = filter(lambda attr_name: attr_name.upper() in ALL_HTTP_METHODS, view_cls.__dict__.keys())
+        view_http_methods = filter(
+            lambda http_method: SchemaTool.
+            _check_view_has_method_attr(view_cls=view_cls, http_method=http_method.lower()),
+            ALL_HTTP_METHODS,
+        )
         swagger_data = {
             'doc_string': view_cls.__doc__,
             'view_name': view_cls.__name__,
