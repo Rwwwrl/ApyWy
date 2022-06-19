@@ -69,11 +69,11 @@ class HomePageSchema(Schema):
 
         HTTP_200 = HttpStatusField(
             expected_response_data={'ANSWER': 'GET-RESULT'},
-            )
+        )
 
         HTTP_500 = HttpStatusField(
             expected_response_data={'ANSWER': 'GET-INVALID-RESULT'},
-            commment='wrong query arg',
+            comment='wrong query arg',
         )
 ```
 * Навешиваем эту схему на view:
@@ -120,11 +120,11 @@ class HomePageSchema(Schema):
 
         HTTP_200 = HttpStatusField(
             expected_response_data={'ANSWER': 'GET-RESULT'},
-            )
+        )
 
         HTTP_500 = HttpStatusField(
             expected_response_data={'ANSWER': 'GET-INVALID-RESULT'},
-            commment='wrong query arg',
+            comment='wrong query arg',
         )
 
     class POST(HttpMethodField):

@@ -30,13 +30,13 @@ class HttpStatusField:
     '''
     Класс поля статуса HTTP метода.
     '''
-    def __init__(self, expected_response_data: Dict, commment: Optional[str] = None) -> None:
+    def __init__(self, expected_response_data: Dict, comment: Optional[str] = None) -> None:
         '''
         @param expected_response_data: Dict - значение ожидаемого словаря от бэкенда
         @param commnent: str - дополнительный комментарий по желанию
         '''
         self.expected_response_data = expected_response_data
-        self.comment = commment
+        self.comment = comment
         self.response_status_code = None
 
     def to_representation(self) -> Dict:
