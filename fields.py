@@ -1,6 +1,6 @@
-import json
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, Union
 
+from .constants_types import ListOfConstants, WithQuery, WithoutQuery
 from .service_layer.serializers import BaseHTTPField
 
 
@@ -30,11 +30,21 @@ class HttpStatusField:
     '''
     Класс поля статуса HTTP метода.
     '''
-    def __init__(self, expected_response_data: Dict, comment: Optional[str] = None) -> None:
+    def __init__(
+        self,
+        expected_response_data: Union[Dict, WithoutQuery, WithQuery, ListOfConstants],
+        comment: Optional[str] = None,
+    ) -> None:
         '''
         @param expected_response_data: Dict - значение ожидаемого словаря от бэкенда
         @param commnent: str - дополнительный комментарий по желанию
         '''
+        if isinstance(expected_response_data, dict):
+            expected_response_data = ListOfConstants(WithoutQuery(expected_response_data=expected_response_data))
+
+        if isinstance(expected_response_data, (WithoutQuery, WithQuery)):
+            expected_response_data = ListOfConstants(expected_response_data)
+
         self.expected_response_data = expected_response_data
         self.comment = comment
         self.response_status_code = None
@@ -43,10 +53,9 @@ class HttpStatusField:
         '''
         По аналогию с drf, метод отвечающий за серилазацию поля
         '''
-        beautify_expected_response_data = json.dumps(self.expected_response_data, indent=4, ensure_ascii=False)
         return {
             'expected_response_status_code': self.response_status_code,
-            'expected_response_data': beautify_expected_response_data,
+            'expected_response_data': self.expected_response_data.to_representation(),
             'comment': self.comment,
         }
 

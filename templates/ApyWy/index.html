@@ -66,7 +66,20 @@
                           <div class="status_comment"><q>{{ http_status.comment }}</q></div>
                           {% endif %}
                         </div>
-                        <div class='status_response_data hide'><pre>{{ http_status.expected_response_data }}</pre></div>
+                        <div class="status_response_data_block hide">
+                            {% for expected_response_data in http_status.expected_response_data %}
+                                {% if expected_response_data.query_arg %}
+                                    {% for key, value in expected_response_data.query_arg.items %}
+                                        <div class="query_key_value_block">
+                                            <div class="query_key">{{ key }}</div>=<div class="query_value">{{ value }}</div>
+                                        </div>
+                                    {% endfor %}
+                                {% else %}
+                                {% endif %}
+                                <div class='status_response_data'><pre>{{ expected_response_data.expected_response_data }}</pre></div>
+                                <hr>
+                            {% endfor %}
+                        </div>
                       </div>
                 {% endfor %}
               </div>

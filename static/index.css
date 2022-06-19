@@ -172,7 +172,7 @@ code {
   font-size: 20px;
 }
 
-.status_response_data {
+.status_response_data_block {
   padding: 20px 0 50px 5%;
   border: solid;
   border-radius: 0 0 5px 5px;
@@ -185,8 +185,29 @@ code {
   font-weight: bolder;
 }
 
-.status_response_data.hide {
+.status_response_data_block.hide {
   display: none;
+  border: none;
+}
+
+.query_block_value_block {
+  display: flex;
+  flex-direction: row;
+  color: #3b394c;
+}
+
+.query_key {
+  font-size: 20px;
+  font-weight: 900;
+  display: inline;
+  margin-right: 20px;
+}
+
+.query_value {
+  font-weight: 500;
+  font-size: 20px;
+  display: inline;
+  margin-left: 20px;
 }
 
 .request_data {
@@ -203,6 +224,7 @@ code {
 
 .expected_request_data_block.hide {
   display: none;
+  border: none;
 }
 
 .expected_request_data {
@@ -228,5 +250,5 @@ code {
 
 .expected_request_data_data.hide {
   display: None;
+  border: none;
 }
-
