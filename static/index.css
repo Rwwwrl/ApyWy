@@ -84,14 +84,19 @@ code {
   justify-content: center;
 }
 
+.http_url_block {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+
 .http_url {
   display: flex;
   flex-direction: row;
-  justify-content: center;
-  align-items: center;
   margin: 0 4px;
   font-size: 20px;
   color: #394151;
+  margin-bottom: 5px;
 }
 
 .http_url_path {

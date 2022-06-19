@@ -1,4 +1,4 @@
-from typing import Any, Dict, List
+from typing import Any, Callable, Dict, List
 
 from django.urls.resolvers import URLPattern
 
@@ -21,6 +21,21 @@ class Singletone:
         cls._instances[key] = instance
         return instance
 
+    @staticmethod
+    def has_initialized(init_method: Callable) -> Callable:
+        '''
+        декоратор, чтобы не заходить в __init__ метода класса, если объект уже был создан
+
+        @param init_method - __init__ метода класса.
+        '''
+        def inner(instance: Any, *args: Any, **kwargs: Any) -> None:
+            if hasattr(instance, '_has_initialized'):
+                return
+            instance._has_initialized = True
+            init_method(instance, *args, **kwargs)
+
+        return inner
+
 
 class NameSpace(Singletone):
     '''
@@ -32,6 +47,7 @@ class NameSpace(Singletone):
     def __new__(cls, namespace_name: str, *args: Any, **kwargs: Any) -> "NameSpace":
         return super().__new__(cls, key=namespace_name)
 
+    @Singletone.has_initialized
     def __init__(self, namespace_name: str):
         '''
         @param namespace_name: str - имя джанговского namespace
@@ -53,13 +69,17 @@ class View(Singletone):
 
     _instances: Dict[str, 'View'] = {}
 
-    def __new__(cls, view_class: DjangoView, *args: Any, **kwargs: Any) -> 'View':
-        view_class_name = view_class.__name__
-        return super().__new__(cls, key=view_class_name)
+    def __new__(cls, django_view_class: DjangoView, *args: Any, **kwargs: Any) -> 'View':
+        django_view_class_name = django_view_class.__name__
+        return super().__new__(cls, key=django_view_class_name)
 
-    def __init__(self, view_class: DjangoView, url_path: URLPattern) -> None:
-        self.view_class = view_class
-        self.url_path = url_path
+    @Singletone.has_initialized
+    def __init__(self, django_view_class: DjangoView, url_path: URLPattern) -> None:
+        self.django_view_class = django_view_class
+        self.url_paths = [url_path]
 
     def __repr__(self) -> str:
-        return f'<View: {self.view_class.__name__}>'
+        return f'<View: {self.django_view_class.__name__}>'
+
+    def append_url_path(self, url_path: URLPattern) -> None:
+        self.url_paths.append(url_path)

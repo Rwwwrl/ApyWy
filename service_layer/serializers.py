@@ -3,6 +3,7 @@ from typing import Dict, List
 
 from .entities import NameSpace
 from .schema_tool import SchemaTool
+from .static_funcs import get_paths_data_of_view
 
 
 class BaseHTTPField:
@@ -36,9 +37,8 @@ class NameSpaceSerializer:
             namespace_data['views'] = []    # type: ignore
             for view in namespace.views:
                 view_data = {}
-                view_data['url_path'] = view.url_path._root + str(view.url_path)
-                view_data['url_name'] = view.url_path.name
-                schema_data = SchemaTool.get_schema_data_of_view_class(view_cls=view.view_class)
+                view_data['urls_data'] = get_paths_data_of_view(view=view)
+                schema_data = SchemaTool.get_schema_data_of_view_class(view_cls=view.django_view_class)
                 view_data['doc_string'] = schema_data['doc_string']
                 view_data['view_name'] = schema_data['view_name']
                 view_data['view_methods'] = []    # type: ignore

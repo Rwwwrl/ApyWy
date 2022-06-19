@@ -57,4 +57,4 @@ class SchemaTool:
         Навесить дефолтные данные schema на все view во views
         '''
         for view in views:
-            SchemaTool.set_default_schema_data_to_view_class(view_cls=view.view_class)
+            SchemaTool.set_default_schema_data_to_view_class(view_cls=view.django_view_class)

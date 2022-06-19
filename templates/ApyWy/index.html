@@ -27,15 +27,23 @@
                   {% if view.doc_string %}
                     <p class='view_doc_string'><q>{{ view.doc_string }}<q></p>
                   {% endif %}
+                                        
+                  <div class="http_url_block">
+                    {% for url_path_data in view.urls_data  %}
+                        <div class="http_url">
+                            <div class="http_url_path">{{ url_path_data.url_full_path }}</div>
+                            {% if url_path_data.url_name %}
+                                <div class="http_url_name"><p>{{ url_path_data.url_name }}</p></div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                  </div>
+
               </div>
               {% for method in view.view_methods %}
                   <div class="method_block">
                       <div class="http_method_block"><p class="http_method">{{ method.HTTP_method }}</p></div>
                       <div class="http_url_block">
-                          <div class="http_url http_url_path">{{ view.url_path }}</div>
-                          {% if view.url_name %}
-                            <div class="http_url http_url_name"><p>{{ view.url_name }}</p></div>
-                          {% endif %}
                           {% if method.doc_string %}
                             <div class="http_url http_url_doc_string"><q>{{ method.doc_string }}</q></div>
                           {% endif %}
