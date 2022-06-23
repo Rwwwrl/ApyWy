@@ -1,6 +1,7 @@
 import abc
 from typing import Dict, List, Tuple
 
+from .constants import exceptions
 from .constants.const import ListOfConstants
 from .constants.request import const as req_const
 from .constants.response import const as res_const
@@ -21,6 +22,15 @@ class StatusField(IField):
         '''
         @param expected_response_data: Dict - значение ожидаемого словаря от бэкенда
         '''
+
+        if isinstance(expected_response_data, dict):
+            raise exceptions.NotValidResponseData(
+                '''
+                Больше использование expected_response_data не доступно, используйте
+                res_const.WithoutQuery или res_const.WithQuery.
+                ''',
+            )
+
         if isinstance(expected_response_data, (res_const.WithoutQuery, res_const.WithQuery)):
             expected_response_data = ListOfConstants(expected_response_data)
 
@@ -73,8 +83,11 @@ class BaseMethodField(IField, metaclass=MethodFieldMETA):
         expected_request_data = self.META.expected_request_data    # type: ignore
         if expected_request_data is not None:
             if isinstance(expected_request_data, dict):
-                expected_request_data = ListOfConstants(
-                    req_const.WithoutQuery(expected_request_data=expected_request_data),
+                raise exceptions.NotValidRequestData(
+                    '''
+                    Больше использование expected_request_data не доступно, используйте
+                    req_const.WithoutQuery или req_const.WithQuery.
+                    ''',
                 )
             if isinstance(expected_request_data, (req_const.WithoutQuery, req_const.WithQuery)):
                 expected_request_data = ListOfConstants(expected_request_data)
