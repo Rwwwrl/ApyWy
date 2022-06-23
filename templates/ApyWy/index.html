@@ -22,13 +22,14 @@
         <hr>
         <div class="view_container">
           {% for view in namespace.views %}
-              <div class="view_block">
-                  <h2 class='view_name'>{{ view.view_name }}</h2>
-                  {% if view.doc_string %}
+             <h2 class='view_name'>{{ view.view_name }}</h2>
+             <div class="view_block">
+                <div class="view_info">
+                {% if view.doc_string %}
                     <p class='view_doc_string'><q>{{ view.doc_string }}<q></p>
-                  {% endif %}
+                {% endif %}
                                         
-                  <div class="http_url_block">
+                <div class="http_url_block">
                     {% for url_path_data in view.urls_data  %}
                         <div class="http_url">
                             <div class="http_url_path">{{ url_path_data.url_full_path }}</div>
@@ -37,7 +38,8 @@
                             {% endif %}
                         </div>
                     {% endfor %}
-                  </div>
+                </div>
+              </div>
 
               </div>
               {% for method in view.view_methods %}
@@ -51,21 +53,28 @@
                   </div>
                   <div class="request_data">
                     {% if method.http_data.expected_request_data is None %}
-                      <div class='expected_request_data_block hide'><p class='expected_request_data'>Expected request data</p></div>
+                      <div class='expected_request_data_block hide'>
+                        <div class='expected_request_data'>Expected request data</div>
+                      </div>
                     {% else %}
                       <div class='expected_request_data_block'><p class='expected_request_data'>Expected request data</p>
                         <div class="expected_request_data_data_block hide">
                           {% for expected_request_data in method.http_data.expected_request_data %}
                               {% if expected_request_data.query_arg %}
-                                  {% for key, value in expected_request_data.query_arg.items %}
-                                      <div class="query_key_value_block">
-                                          <div class="query_key">{{ key }}</div>=<div class="query_value">{{ value }}</div>
-                                      </div>
-                                  {% endfor %}
+                                <div class="query_key_value_block">
+                                    {% for key, value in expected_request_data.query_arg.items %}
+                                        <div class="query_key_value_line">
+                                            <div class="query_key">{{ key }}</div>=<div class="query_value">{{ value }}</div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
                               {% else %}
                               {% endif %}
                             <div class='expected_request_data_data'><pre>{{ expected_request_data.expected_request_data }}</pre></div>
-                            <hr>
+                            {% if not forloop.last %}
+                                <hr class='status_hr'> 
+                            {% else %}
+                            {% endif %}
                           {% endfor %}
                         </div>  
                       </div>
@@ -83,15 +92,20 @@
                                     <div class="status_comment"><q>{{ expected_response_data.comment }}</q></div>
                                 {% endif %}
                                 {% if expected_response_data.query_arg %}
-                                    {% for key, value in expected_response_data.query_arg.items %}
-                                        <div class="query_key_value_block">
-                                            <div class="query_key">{{ key }}</div>=<div class="query_value">{{ value }}</div>
-                                        </div>
-                                    {% endfor %}
+                                    <div class="query_key_value_block">
+                                        {% for key, value in expected_response_data.query_arg.items %}
+                                            <div class="query_key_value_line">
+                                                <div class="query_key">{{ key }}</div>=<div class="query_value">{{ value }}</div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
                                 {% else %}
                                 {% endif %}
                                 <div class='status_response_data'><pre>{{ expected_response_data.expected_response_data }}</pre></div>
-                                <hr>
+                                {% if not forloop.last %}
+                                    <hr class='status_hr'> 
+                                {% else %}
+                                {% endif %}
                             {% endfor %}
                         </div>
                       </div>

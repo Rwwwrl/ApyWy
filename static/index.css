@@ -31,10 +31,12 @@ code {
 }
 
 .view_block {
-  margin-top: 50px;
+  margin-top: 10px;
+  margin-left: 2.5%;
 }
 
 .view_name {
+  margin-top: 50px;
   color: #3b394c;
   font-weight: bold;
   font-size: 40px;
@@ -164,7 +166,6 @@ code {
   display: flex;
   flex-direction: row;
   align-items: center;
-  margin-left: 20px;
   color: green;
   font-weight: bold;
   font-style: italic;
@@ -184,29 +185,41 @@ code {
   font-weight: bolder;
 }
 
+.status_hr {
+  max-width: 80%;
+  margin: 25px 0;
+  padding: 0;
+}
+
 .status_response_data_block.hide {
   display: none;
   border: none;
 }
 
-.query_block_value_block {
+.query_key_value_block {
+  display: flex;
+  flex-direction: column;
+}
+
+.query_key_value_line {
   display: flex;
   flex-direction: row;
+  align-items: center;
   color: #3b394c;
 }
 
 .query_key {
   font-size: 20px;
   font-weight: 900;
+  font-style: italic;
   display: inline;
-  margin-right: 20px;
+  margin-right: 3px;
 }
 
 .query_value {
-  font-weight: 500;
   font-size: 20px;
   display: inline;
-  margin-left: 20px;
+  margin-left: 3px;
 }
 
 .request_data {
@@ -227,10 +240,10 @@ code {
 }
 
 .expected_request_data {
-  display: block;
-  max-width: 18%;
+  margin-left: 2.5%;
   padding: 10px 20px;
   background-color: #00cf95;
+  width: max-content;
   color: white;
   font-size: 20px;
   font-weight: bolder;
@@ -239,13 +252,14 @@ code {
 .expected_request_data_data_block {
   padding: 20px 0 50px 5%;
   border: solid;
-  border-radius: 0 5px 5px 5px;
+  border-radius: 0 0 5px 5px;
   border-width: 2px;
   background-color: #e4f7f1;
   border-color: #00cf95;
   font-size: 15px;
   color: #3b394c;
   font-weight: bolder;
+  /* border-top: none; */
 }
 
 .expected_request_data_data_block.hide {
