@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
-from ..service_layer.initializers import NameSpacesInitializer, ViewsInitializer
+from ..adapters.initializers import NamespacesInitializer, ViewsInitializer
 from ..service_layer.schema_tool import SchemaTool
 
 
@@ -9,5 +9,6 @@ class ApywyConfig(AppConfig):
     name = 'apywy'
 
     def ready(self) -> None:
-        NameSpacesInitializer.ready()
-        SchemaTool.set_default_schema_data_to_views(views=ViewsInitializer.VIEWS)    # type: ignore
+        NamespacesInitializer.ready()
+        views = ViewsInitializer.repository.all()    # type: ignore
+        SchemaTool.set_default_schema_data_to_views(views=views)
