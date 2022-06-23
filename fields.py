@@ -2,13 +2,15 @@ import abc
 from typing import Dict, List, Tuple
 
 from .constants import exceptions
-from .constants.const import ListOfConstants
-from .constants.request import const as req_const
-from .constants.response import const as res_const
-from .utilities.custom_typing import ResponseConst
+from .constants.const import Constant, ListOfConstants
+from .utilities.custom_typing import AnyConst
 
 
 class IField:
+    @abc.abstractmethod
+    def _pre_normalize_data(self, expected_data: AnyConst) -> ListOfConstants:
+        raise NotImplementedError
+
     @abc.abstractmethod
     def to_representation(self) -> Dict:
         raise NotImplementedError
@@ -18,24 +20,29 @@ class StatusField(IField):
     '''
     Класс поля статуса HTTP метода.
     '''
-    def __init__(self, expected_response_data: ResponseConst):
+    def __init__(self, expected_response_data: AnyConst):
         '''
         @param expected_response_data: Dict - значение ожидаемого словаря от бэкенда
         '''
 
-        if isinstance(expected_response_data, dict):
+        self.expected_response_data = self._pre_normalize_data(expected_response_data)
+        self.response_status_code = None
+
+    def _pre_normalize_data(self, expected_data: AnyConst) -> ListOfConstants:
+        if isinstance(expected_data, dict):
             raise exceptions.NotValidResponseData(
                 '''
-                Больше использование expected_response_data не доступно, используйте
-                res_const.WithoutQuery или res_const.WithQuery.
+                Больше использование expected_response_data не доступно, используйте Const.
                 ''',
             )
 
-        if isinstance(expected_response_data, (res_const.WithoutQuery, res_const.WithQuery)):
-            expected_response_data = ListOfConstants(expected_response_data)
+        if isinstance(expected_data, Constant):
+            expected_data = expected_data.to_response_const()
+            return ListOfConstants(expected_data)
 
-        self.expected_response_data = expected_response_data
-        self.response_status_code = None
+        if isinstance(expected_data, ListOfConstants):
+            expected_data.convert_own_constants_type(to_response=True)
+            return expected_data
 
     def to_representation(self) -> Dict:
         return {
@@ -44,8 +51,34 @@ class StatusField(IField):
         }
 
 
+class RequestDataField(IField):
+    def __init__(self, expected_request_data: AnyConst):
+        self.expected_request_data = self._pre_normalize_data(expected_data=expected_request_data)
+
+    def _pre_normalize_data(self, expected_data: AnyConst) -> ListOfConstants:
+        if isinstance(expected_data, dict):
+            raise exceptions.NotValidRequestData(
+                '''
+                Больше использование expected_request_data не доступно, используйте Constant.
+                ''',
+            )
+        if isinstance(expected_data, Constant):
+            expected_data = expected_data.to_request_const()
+            return ListOfConstants(expected_data)
+
+        if isinstance(expected_data, ListOfConstants):
+            expected_data.convert_own_constants_type(to_response=False)
+            return expected_data
+
+    def to_representation(self) -> Dict:
+        return {
+            'expected_request_data': self.expected_request_data.to_representation(),
+        }
+
+
 class MethodFieldMETA(type):
     '''
+    TODO возможно его нужно сделать декоратором
     Метакласс, нужен лишь для добавления атрибута _http_statuses у BaseMethodField
     '''
     def __new__(cls, clsname: str, parents: Tuple, attrdict: Dict) -> 'MethodFieldMETA':
@@ -65,7 +98,7 @@ class MethodFieldMETA(type):
         return super().__new__(cls, clsname, parents, attrdict)
 
 
-class BaseMethodField(IField, metaclass=MethodFieldMETA):
+class MethodField(IField, metaclass=MethodFieldMETA):
     '''
     базовый класс HTTPField, нужный для сериализации
     '''
@@ -82,18 +115,9 @@ class BaseMethodField(IField, metaclass=MethodFieldMETA):
     def _representation_request_part(self) -> Dict:
         expected_request_data = self.META.expected_request_data    # type: ignore
         if expected_request_data is not None:
-            if isinstance(expected_request_data, dict):
-                raise exceptions.NotValidRequestData(
-                    '''
-                    Больше использование expected_request_data не доступно, используйте
-                    req_const.WithoutQuery или req_const.WithQuery.
-                    ''',
-                )
-            if isinstance(expected_request_data, (req_const.WithoutQuery, req_const.WithQuery)):
-                expected_request_data = ListOfConstants(expected_request_data)
-            expected_request_data = expected_request_data.to_representation()
-
-        data = {'expected_request_data': expected_request_data}
+            data = expected_request_data.to_representation()
+        else:
+            data = {'expected_request_data': None}
         return data
 
     def to_representation(self) -> Dict:
@@ -108,15 +132,7 @@ class BaseMethodField(IField, metaclass=MethodFieldMETA):
         expected_request_data = None
 
 
-class MethodField(BaseMethodField, IField):
-    '''
-    Поле HTTP метода
-    '''
-    def to_representation(self) -> Dict:
-        return super().to_representation()
-
-
-class EmptyMethodField(BaseMethodField, IField):
+class EmptyMethodField(IField):
     '''
     Поле пустого (не определенного разработчиком) HTTP метода. Нужен для присваивания в декораторе, ручками
     разработчик его навешивать не должен.
