@@ -2,7 +2,8 @@ import abc
 from typing import List
 
 from . import repositories
-from ..service_layer import entities, static_funcs
+from .. import static_funcs
+from ..domain import entities
 
 
 class BaseInitializer:

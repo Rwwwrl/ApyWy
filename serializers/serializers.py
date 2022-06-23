@@ -1,28 +1,8 @@
-import json
 from typing import Dict, List
 
-from .entities import NameSpace
-from .schema_tool import SchemaTool
-from .static_funcs import get_paths_data_of_view
-
-
-class BaseHTTPField:
-    '''
-    базовый класс HTTPField, нужный для сериализации
-    '''
-    def to_representation(self) -> Dict:
-        '''
-        По аналогию с drf, метод отвечающий за серилазацию поля
-        '''
-        expected_request_data = self.META.expected_request_data    # type: ignore
-        if expected_request_data is not None:
-            expected_request_data = json.dumps(expected_request_data, indent=4, ensure_ascii=False)
-
-        data: Dict = {'http_statuses': [], 'expected_request_data': expected_request_data}
-        return data
-
-    class META:
-        expected_request_data = None
+from ..domain.entities import NameSpace
+from ..schema_tool import SchemaTool
+from ..static_funcs import get_paths_data_of_view
 
 
 class NameSpaceSerializer:

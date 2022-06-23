@@ -219,16 +219,17 @@ code {
 
 .expected_request_data_block {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
+  justify-content: flex-start;
 }
 
 .expected_request_data_block.hide {
   display: none;
-  border: none;
 }
 
 .expected_request_data {
   display: block;
+  max-width: 18%;
   padding: 10px 20px;
   background-color: #00cf95;
   color: white;
@@ -236,7 +237,7 @@ code {
   font-weight: bolder;
 }
 
-.expected_request_data_data {
+.expected_request_data_data_block {
   padding: 20px 0 50px 5%;
   border: solid;
   border-radius: 0 5px 5px 5px;
@@ -248,7 +249,7 @@ code {
   font-weight: bolder;
 }
 
-.expected_request_data_data.hide {
+.expected_request_data_data_block.hide {
   display: None;
   border: none;
 }

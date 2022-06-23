@@ -53,9 +53,23 @@
                     {% if method.http_data.expected_request_data is None %}
                       <div class='expected_request_data_block hide'><p class='expected_request_data'>Expected request data</p></div>
                     {% else %}
-                      <div class='expected_request_data_block'><p class='expected_request_data'>Expected request data</p></div>
+                      <div class='expected_request_data_block'><p class='expected_request_data'>Expected request data</p>
+                        <div class="expected_request_data_data_block hide">
+                          {% for expected_request_data in method.http_data.expected_request_data %}
+                              {% if expected_request_data.query_arg %}
+                                  {% for key, value in expected_request_data.query_arg.items %}
+                                      <div class="query_key_value_block">
+                                          <div class="query_key">{{ key }}</div>=<div class="query_value">{{ value }}</div>
+                                      </div>
+                                  {% endfor %}
+                              {% else %}
+                              {% endif %}
+                            <div class='expected_request_data_data'><pre>{{ expected_request_data.expected_request_data }}</pre></div>
+                            <hr>
+                          {% endfor %}
+                        </div>  
+                      </div>
                     {% endif %}
-                    <div class='expected_request_data_data hide'><pre>{{ method.http_data.expected_request_data }}</pre></div>
                   </div>
               <div class="status_container">
                 {% for http_status in method.http_data.http_statuses %}

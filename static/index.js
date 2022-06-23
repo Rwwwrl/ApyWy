@@ -6,7 +6,7 @@ let statuses_blocks = document.querySelectorAll('.status_block')
 let response_datas = document.querySelectorAll('.status_response_data_block')
 
 let expected_request_datas = document.querySelectorAll('.expected_request_data')
-let expected_request_data_datas = document.querySelectorAll('.expected_request_data_data')
+let expected_request_data_datas = document.querySelectorAll('.expected_request_data_data_block')
 
 const zip = (...arr) => {
     const zipped = [];

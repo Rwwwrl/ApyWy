@@ -1,8 +1,8 @@
 from typing import Callable
 
-from .fields import EmptyHttpMethodField
+from .fields import EmptyMethodField
 from .schema import Schema
-from .service_layer.schema_tool import SchemaTool
+from .schema_tool import SchemaTool
 from .utilities.custom_typing import DjangoView
 
 
@@ -21,7 +21,7 @@ def set_apywy_schema(schema: Schema) -> Callable:
             schema_data_class = getattr(
                 schema,
                 method_schema_data,
-                EmptyHttpMethodField,
+                EmptyMethodField,
             )
 
             schema_data['methods'][method_schema_data]['schema_data'] = schema_data_class()

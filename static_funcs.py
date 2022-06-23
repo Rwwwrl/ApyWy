@@ -3,7 +3,7 @@ from typing import Dict, List, Optional, Tuple, Union
 from django.conf import settings
 from django.urls.resolvers import URLPattern, URLResolver
 
-from .entities import NameSpace, View
+from .domain.entities import NameSpace, View
 
 BUILDIN_NAMESPACES_TO_IGNORE = ('apywy', 'admin')
 USER_DECLARED_NAMESPACES_TO_IGNORE: Tuple = getattr(settings, 'NAMESPACES_TO_IGNORE', tuple())

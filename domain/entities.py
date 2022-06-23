@@ -6,6 +6,13 @@ from ..utilities.custom_typing import DjangoView
 
 
 class Singletone:
+    '''
+    Как происходит создание экземпляра данного и родительских классов:
+    1) Кажый экземпяр должен имееть ключ (key), который однозначно бы определял его среди других экземпляров
+     этого же класса
+    2) Если экземпляр с ключом key уже был инициализирован, то по итогу инициализации мы получаем уже старый созданный
+     экземпляр else создаем новый экземпляр и его и возвращаем
+    '''
 
     _instances: Dict[str, Any] = {}
 
@@ -42,6 +49,9 @@ class NameSpace(Singletone):
     класс, который связыват namespace и его views, синглтон
     '''
 
+    namespace_name: str
+    views: List['View']
+
     _instances: Dict[str, 'NameSpace'] = {}
 
     def __new__(cls, namespace_name: str, *args: Any, **kwargs: Any) -> "NameSpace":
@@ -67,6 +77,9 @@ class View(Singletone):
     класс, который связыват класс DjangoView и его url путь, синглтон
     '''
 
+    django_view_class: DjangoView    # type: ignore
+    url_paths: List[URLPattern]
+
     _instances: Dict[str, 'View'] = {}
 
     def __new__(cls, django_view_class: DjangoView, *args: Any, **kwargs: Any) -> 'View':
@@ -79,7 +92,7 @@ class View(Singletone):
         self.url_paths = [url_path]
 
     def __repr__(self) -> str:
-        return f'<View: {self.django_view_class.__name__}>'
+        return f'<View: {self.django_view_class.__name__}>'    # type: ignore
 
     def append_url_path(self, url_path: URLPattern) -> None:
         self.url_paths.append(url_path)

@@ -1,21 +1,58 @@
+import abc
 from typing import Dict, List, Optional, Tuple, Union
 
-from .constants_types import ListOfConstants, WithQuery, WithoutQuery
-from .service_layer.serializers import BaseHTTPField
+from .constants.const import ListOfConstants
+from .constants.request import const as req_const
+from .constants.response import const as res_const
+from .utilities.custom_typing import ResponseConst
 
 
-class HttpMethodFieldMETA(type):
+class IField:
+    @abc.abstractmethod
+    def to_representation(self) -> Dict:
+        raise NotImplementedError
+
+
+class StatusField(IField):
     '''
-    TODO возможно его стоит переписать в декоратор
-    Метакласс, нужен лишь для добавления атрибута _http_statuses у DefaulHttpMethodField
+    Класс поля статуса HTTP метода.
     '''
-    def __new__(cls, clsname: str, parents: Tuple, attrdict: Dict) -> 'HttpMethodFieldMETA':
+    def __init__(self, expected_response_data: Union[Dict, ResponseConst], comment: Optional[str] = None):
+        '''
+        @param expected_response_data: Dict - значение ожидаемого словаря от бэкенда
+        @param comment: str - дополнительный комментарий по желанию
+        '''
+        if isinstance(expected_response_data, dict):
+            expected_response_data = ListOfConstants(
+                res_const.WithoutQuery(expected_response_data=expected_response_data),
+            )
+
+        if isinstance(expected_response_data, (res_const.WithoutQuery, res_const.WithQuery)):
+            expected_response_data = ListOfConstants(expected_response_data)
+
+        self.expected_response_data = expected_response_data
+        self.comment = comment
+        self.response_status_code = None
+
+    def to_representation(self) -> Dict:
+        return {
+            'expected_response_status_code': self.response_status_code,
+            'expected_response_data': self.expected_response_data.to_representation(),
+            'comment': self.comment,
+        }
+
+
+class MethodFieldMETA(type):
+    '''
+    Метакласс, нужен лишь для добавления атрибута _http_statuses у BaseMethodField
+    '''
+    def __new__(cls, clsname: str, parents: Tuple, attrdict: Dict) -> 'MethodFieldMETA':
 
         http_statuses = []
 
         for key, attr in attrdict.items():
-            if isinstance(attr, HttpStatusField):
-                # получить статус код по имени атрибута
+            if isinstance(attr, StatusField):
+                # получаем статус код по имени атрибута
                 response_status_code = key.split('_')[-1]
                 attr.response_status_code = response_status_code
 
@@ -26,58 +63,58 @@ class HttpMethodFieldMETA(type):
         return super().__new__(cls, clsname, parents, attrdict)
 
 
-class HttpStatusField:
+class BaseMethodField(IField, metaclass=MethodFieldMETA):
     '''
-    Класс поля статуса HTTP метода.
+    базовый класс HTTPField, нужный для сериализации
     '''
-    def __init__(
-        self,
-        expected_response_data: Union[Dict, WithoutQuery, WithQuery, ListOfConstants],
-        comment: Optional[str] = None,
-    ) -> None:
-        '''
-        @param expected_response_data: Dict - значение ожидаемого словаря от бэкенда
-        @param commnent: str - дополнительный комментарий по желанию
-        '''
-        if isinstance(expected_response_data, dict):
-            expected_response_data = ListOfConstants(WithoutQuery(expected_response_data=expected_response_data))
+    @property
+    def http_statuses(self) -> List['StatusField']:
+        return self._http_statuses    # type: ignore
 
-        if isinstance(expected_response_data, (WithoutQuery, WithQuery)):
-            expected_response_data = ListOfConstants(expected_response_data)
+    def _representation_response_part(self) -> Dict:
+        data: Dict = {'http_statuses': []}
+        for http_status in self.http_statuses:
+            data['http_statuses'].append(http_status.to_representation())    # type: ignore
+        return data
 
-        self.expected_response_data = expected_response_data
-        self.comment = comment
-        self.response_status_code = None
+    def _representation_request_part(self) -> Dict:
+        expected_request_data = self.META.expected_request_data    # type: ignore
+        if expected_request_data is not None:
+            if isinstance(expected_request_data, dict):
+                expected_request_data = ListOfConstants(
+                    req_const.WithoutQuery(expected_request_data=expected_request_data),
+                )
+            if isinstance(expected_request_data, (req_const.WithoutQuery, req_const.WithQuery)):
+                expected_request_data = ListOfConstants(expected_request_data)
+            expected_request_data = expected_request_data.to_representation()
+
+        data = {'expected_request_data': expected_request_data}
+        return data
 
     def to_representation(self) -> Dict:
         '''
         По аналогию с drf, метод отвечающий за серилазацию поля
         '''
-        return {
-            'expected_response_status_code': self.response_status_code,
-            'expected_response_data': self.expected_response_data.to_representation(),
-            'comment': self.comment,
-        }
+        response_part = self._representation_response_part()
+        request_part = self._representation_request_part()
+        return {**response_part, **request_part}
+
+    class META:
+        expected_request_data = None
 
 
-class HttpMethodField(BaseHTTPField, metaclass=HttpMethodFieldMETA):
+class MethodField(BaseMethodField, IField):
     '''
     Поле HTTP метода
     '''
-    @property
-    def http_statuses(self) -> List[HttpStatusField]:
-        return self._http_statuses    # type: ignore
-
     def to_representation(self) -> Dict:
-        data = super().to_representation()
-        for http_status in self.http_statuses:
-            data['http_statuses'].append(http_status.to_representation())    # type: ignore
-        return data
+        return super().to_representation()
 
 
-class EmptyHttpMethodField(BaseHTTPField):
+class EmptyMethodField(BaseMethodField, IField):
     '''
     Поле пустого (не определенного разработчиком) HTTP метода. Нужен для присваивания в декораторе, ручками
     разработчик его навешивать не должен.
     '''
-    pass
+    def to_representation(self) -> Dict:
+        return {'http_statuses': [], 'expected_request_data': None}

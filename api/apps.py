@@ -1,7 +1,7 @@
 from django.apps import AppConfig
 
 from ..adapters.initializers import NamespacesInitializer, ViewsInitializer
-from ..service_layer.schema_tool import SchemaTool
+from ..schema_tool import SchemaTool
 
 
 class ApywyConfig(AppConfig):

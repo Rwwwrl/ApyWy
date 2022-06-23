@@ -1,14 +1,6 @@
 import json
 from dataclasses import dataclass
-from typing import Dict, List, Union
-
-
-class ListOfConstants:
-    def __init__(self, *constants: Union['WithoutQuery', 'WithQuery']):
-        self.constants = constants
-
-    def to_representation(self) -> List[Dict]:
-        return [const.to_representation() for const in self.constants]
+from typing import Dict
 
 
 @dataclass
@@ -36,5 +28,6 @@ class WithQuery(Constant):
         return data
 
 
+@dataclass
 class WithoutQuery(Constant):
     pass

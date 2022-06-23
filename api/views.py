@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.views import View
 
 from ..adapters.initializers import NamespacesInitializer
-from ..service_layer.serializers import NameSpaceSerializer
+from ..serializers.serializers import NameSpaceSerializer
 from ..utilities.custom_typing import HttpRequest, HttpResponse
 
 

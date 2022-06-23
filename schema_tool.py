@@ -1,7 +1,7 @@
 from typing import Dict, List
 
-from . import entities
-from ..utilities.custom_typing import DjangoView
+from .domain import entities
+from .utilities.custom_typing import DjangoView
 
 ALL_HTTP_METHODS = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']
 
@@ -19,7 +19,7 @@ class SchemaTool:
         '''
         Навесить на класс DjangoView дефолтные schema данные
         '''
-        from .. import fields
+        from . import fields
 
         # нам не нужно навешивать дефолтную схему, если там уже весит схема (от декоратора).
         if hasattr(view_cls, '_schema_data'):
@@ -39,7 +39,7 @@ class SchemaTool:
             http_method = http_method.upper()
             schema_method_data = {
                 'doc_string': getattr(view_cls, http_method.lower()).__doc__,
-                'schema_data': fields.EmptyHttpMethodField(),
+                'schema_data': fields.EmptyMethodField(),
             }
             swagger_data['methods'][http_method] = schema_method_data
         view_cls._schema_data = swagger_data
