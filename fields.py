@@ -1,5 +1,5 @@
 import abc
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Tuple
 
 from .constants.const import ListOfConstants
 from .constants.request import const as req_const
@@ -17,28 +17,20 @@ class StatusField(IField):
     '''
     Класс поля статуса HTTP метода.
     '''
-    def __init__(self, expected_response_data: Union[Dict, ResponseConst], comment: Optional[str] = None):
+    def __init__(self, expected_response_data: ResponseConst):
         '''
         @param expected_response_data: Dict - значение ожидаемого словаря от бэкенда
-        @param comment: str - дополнительный комментарий по желанию
         '''
-        if isinstance(expected_response_data, dict):
-            expected_response_data = ListOfConstants(
-                res_const.WithoutQuery(expected_response_data=expected_response_data),
-            )
-
         if isinstance(expected_response_data, (res_const.WithoutQuery, res_const.WithQuery)):
             expected_response_data = ListOfConstants(expected_response_data)
 
         self.expected_response_data = expected_response_data
-        self.comment = comment
         self.response_status_code = None
 
     def to_representation(self) -> Dict:
         return {
             'expected_response_status_code': self.response_status_code,
             'expected_response_data': self.expected_response_data.to_representation(),
-            'comment': self.comment,
         }
 
 

@@ -141,7 +141,7 @@ code {
 
 .status_block.hide_request_data {
   border-radius: 5px 5px 5px 5px;
-  border-bottom: solid;
+  border: solid 2px
 }
 
 .http_status_block {
@@ -165,7 +165,6 @@ code {
   flex-direction: row;
   align-items: center;
   margin-left: 20px;
-  justify-content: center;
   color: green;
   font-weight: bold;
   font-style: italic;

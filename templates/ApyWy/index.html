@@ -76,12 +76,12 @@
                       <div class="status_data">
                         <div class="status_block hide_request_data">
                           <div class="http_status_block"><p class="http_status">{{ http_status.expected_response_status_code }}</p></div>
-                          {% if http_status.comment %}
-                          <div class="status_comment"><q>{{ http_status.comment }}</q></div>
-                          {% endif %}
                         </div>
                         <div class="status_response_data_block hide">
                             {% for expected_response_data in http_status.expected_response_data %}
+                                {% if expected_response_data.comment %}
+                                    <div class="status_comment"><q>{{ expected_response_data.comment }}</q></div>
+                                {% endif %}
                                 {% if expected_response_data.query_arg %}
                                     {% for key, value in expected_response_data.query_arg.items %}
                                         <div class="query_key_value_block">
